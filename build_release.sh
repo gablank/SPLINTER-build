@@ -29,16 +29,12 @@ function build {
 	make -j$(nproc)
 	make install
 	cp libsplinter-1-4.so libsplinter-static-1-4.a "../linux/$COMPILER/$ARCH"
-
+	echo $($CXX -dumpversion) > "../linux/$COMPILER/compiler_version"
 	if [ $COMPILER = "gcc" ]; then
 		cp -r splinter-matlab ../
 	fi
 }
 
-
-function make_release_files {
-	TARGET_FILE=$1
-}
 
 export CXX=$(which g++)
 build x86 gcc
