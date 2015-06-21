@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ROOT=$(pwd)
+
 SPLINTER_DIR="../../SPLINTER/SPLINTER"
 if [ $# -gt 0 ]; then
 	SPLINTER_DIR=$1
@@ -23,23 +25,38 @@ function build {
 
 	COMPILER=$2
 
-	rm -r *
+	mkdir -p $COMPILER/$ARCH
+	cd $COMPILER/$ARCH
+
+	rm CMakeCache.txt
 	echo "Building SPLINTER for $ARCH with $CXX"
 	cmake $SPLINTER_DIR -DCMAKE_BUILD_TYPE=release -DARCH=$ARCH
 	make -j$(nproc)
 	make install
-	cp libsplinter-1-4.so libsplinter-static-1-4.a "../linux/$COMPILER/$ARCH"
-	echo $($CXX -dumpversion) > "../linux/$COMPILER/compiler_version"
+	cp libsplinter-1-4.so libsplinter-static-1-4.a "$ROOT/linux/$COMPILER/$ARCH"
+
+	# Use GCC to generate the MatLab library
 	if [ $COMPILER = "gcc" ]; then
 		cp -r splinter-matlab ../
 	fi
 }
 
 
+function compress {
+	COMPILER=$1
+	cd $ROOT/linux
+	zip -r "$ROOT/linux-$COMPILER$($CXX -dumpversion).zip" "$COMPILER/"
+	cd $ROOT/build
+}
+
 export CXX=$(which g++)
-build x86 gcc
-build x86-64 gcc
+COMPILER=gcc
+build x86 $COMPILER
+build x86-64 $COMPILER
+compress $COMPILER
 
 export CXX=$(which clang++-3.5)
-build x86 clang
-build x86-64 clang
+COMPILER=clang
+build x86 $COMPILER
+build x86-64 $COMPILER
+compress $COMPILER
