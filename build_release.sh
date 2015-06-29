@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [[ "$(uname)" -eq "Linux" ]]; then
+	echo "Linux"
+else
+	echo "Windows"
+fi
+exit 0
+
 ROOT=$(pwd)
 
 SPLINTER_DIR="../../SPLINTER/SPLINTER"
