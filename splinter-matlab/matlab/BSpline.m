@@ -10,13 +10,6 @@ classdef BSpline < Approximant
         Handle
         
         Constructor_function = 'bspline_init';
-        Destructor_function = 'bspline_delete';
-        Eval_function = 'bspline_eval';
-        EvalJacobian_function = 'bspline_eval_jacobian';
-        EvalHessian_function = 'bspline_eval_hessian';
-        GetNumVariables_function = 'bspline_get_num_variables';
-        Save_function = 'bspline_save';
-        Load_function = 'bspline_load';
     end
 
     methods

@@ -10,13 +10,6 @@ classdef PSpline < Approximant
         Handle
         
         Constructor_function = 'pspline_init';
-        Destructor_function = 'pspline_delete';
-        Eval_function = 'pspline_eval';
-        EvalJacobian_function = 'pspline_eval_jacobian';
-        EvalHessian_function = 'pspline_eval_hessian';
-        GetNumVariables_function = 'pspline_get_num_variables';
-        Save_function = 'pspline_save';
-        Load_function = 'pspline_load';
     end
 
     methods

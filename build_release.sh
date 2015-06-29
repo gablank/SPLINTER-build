@@ -12,8 +12,8 @@ if [[ "$SPLINTER_DIR" != /* ]]; then
 	SPLINTER_DIR="$(pwd)/$SPLINTER_DIR"
 fi
 
-mkdir build
-cd build
+mkdir $ROOT/build
+cd $ROOT/build
 
 function build {
 	ARCH=$1
@@ -25,8 +25,8 @@ function build {
 
 	COMPILER=$2
 
-	mkdir -p $COMPILER/$ARCH
-	cd $COMPILER/$ARCH
+	mkdir -p $ROOT/build/$COMPILER/$ARCH
+	cd $ROOT/build/$COMPILER/$ARCH
 
 	rm CMakeCache.txt
 	echo "Building SPLINTER for $ARCH with $CXX"
@@ -37,17 +37,19 @@ function build {
 
 	# Use GCC to generate the MatLab library
 	if [ $COMPILER = "gcc" ]; then
-		cp -r splinter-matlab ../
+		cp -r splinter-matlab $ROOT
 	fi
+
+	cd $ROOT/build
 }
 
 
 function compress {
 	COMPILER=$1
-	cd $ROOT/linux
-	zip -r "$ROOT/linux-$COMPILER$($CXX -dumpversion).zip" "$COMPILER/"
 	cd $ROOT/build
+	zip -r "$ROOT/linux-$COMPILER$($CXX -dumpversion).zip" "$COMPILER/"
 }
+
 
 export CXX=$(which g++)
 COMPILER=gcc

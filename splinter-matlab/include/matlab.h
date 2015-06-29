@@ -1,8 +1,8 @@
 #ifndef SPLINTER_MATLAB_H
 #define SPLINTER_MATLAB_H
 
-/*#define obj_ptr int * */
-typedef int *obj_ptr;
+/*#define obj_ptr void * */
+typedef void *obj_ptr;
 
 #ifndef API
 # ifdef _MSC_VER
@@ -16,14 +16,12 @@ typedef int *obj_ptr;
 	extern "C"
 	{
 #endif
-		/* 1 if the previous function call resulted in an error, 0 otherwise. */
+		/* 1 if the previous function call caused an error, 0 otherwise. */
 		API int get_error();
 
 
 		API obj_ptr datatable_init();
 
-		API void datatable_add_sample(obj_ptr datatable_ptr, double *x, int x_dim, double y);
-		
 		API void datatable_add_samples(obj_ptr datatable_ptr, double *x, int n_samples, int x_dim);
 
 		API void datatable_delete(obj_ptr datatable_ptr);
@@ -31,41 +29,27 @@ typedef int *obj_ptr;
 
 		API obj_ptr bspline_init(obj_ptr datatable_ptr, int type);
 
-		API double bspline_eval(obj_ptr bspline_ptr, double *x, int n);
+		API obj_ptr pspline_init(obj_ptr datatable_ptr, double lambda);
 
-		API double *bspline_eval_jacobian(obj_ptr bspline_ptr, double *x, int n);
+		API obj_ptr rbf_init(obj_ptr datatable_ptr, int type_index, int normalized);
 
-		API double *bspline_eval_hessian(obj_ptr bspline_ptr, double *x, int n);
-
-		API int bspline_get_num_variables(obj_ptr bspline_ptr);
-
-		API void bspline_delete(obj_ptr bspline_ptr);
+		API obj_ptr polynomial_regression_init(obj_ptr datatable_ptr, int *degrees, int degrees_dim);
 
 
-		API obj_ptr pspline_init(obj_ptr pspline_ptr, double lambda);
+		API double eval(obj_ptr approximant, double *x, int x_dim);
 
-		API double pspline_eval(obj_ptr pspline_ptr, double *x, int x_dim);
+		API double *eval_jacobian(obj_ptr approximant, double *x, int x_dim);
 
-		API double *pspline_eval_jacobian(obj_ptr pspline_ptr, double *x, int x_dim);
+		API double *eval_hessian(obj_ptr approximant, double *x, int x_dim);
 
-		API double *pspline_eval_hessian(obj_ptr pspline_ptr, double *x, int x_dim);
+		API int get_num_variables(obj_ptr approximant);
 
-		API int pspline_get_num_variables(obj_ptr pspline_ptr);
+		API void save(obj_ptr approximant, const char *filename);
 
-		API void pspline_delete(obj_ptr pspline_ptr);
+		API void load(obj_ptr approximant, const char *filename);
 
+		API void delete_approximant(obj_ptr approximant);
 
-		API obj_ptr rbf_init(obj_ptr rbf_ptr, int type_index, int normalized);
-
-		API double rbf_eval(obj_ptr rbf_ptr, double *x, int x_dim);
-
-		API double *rbf_eval_jacobian(obj_ptr rbf_ptr, double *x, int x_dim);
-
-		API double *rbf_eval_hessian(obj_ptr rbf_ptr, double *x, int x_dim);
-
-		API int rbf_get_num_variables(obj_ptr rbf_ptr);
-
-		API void rbf_delete(obj_ptr rbf_ptr);
 #ifdef __cplusplus
 	}
 #endif
