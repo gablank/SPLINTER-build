@@ -289,7 +289,7 @@ do
 	cd $ROOT/$os_dir
 	for compiler_dir in $(echo */) # echo */ gives us a list of the directories
 	do
-		compiler_name=${compiler_dir::-1} # compiler_dir includes the last /, remove it.
+		compiler_name=${compiler_dir%?} # compiler_dir includes the last /, remove it.
 		cd $ROOT/$os_dir/$compiler_dir
 		files=""
 		for arch in $(echo */)
