@@ -284,6 +284,7 @@ if [[ $TAR == ""  && $ZIP == "" ]]; then
 fi
 
 mkdir -p $ROOT/releases
+rm $ROOT/releases/*
 for os_dir in $OSES
 do
 	cd $ROOT/$os_dir
@@ -297,14 +298,13 @@ do
 			files="$arch $files"
 		done
 
-		compiler_version=$(cat compiler_version)
-		filename=$ROOT/releases/$os_dir"_$compiler_name$compiler_version"
+		filename=$ROOT/releases/$os_dir"_"$compiler_name$(cat compiler_version)
 		echo "Creating archive called $filename from $files"
 
 		OLDWD=$(pwd)
-		cd $ROOT/$os_dir/$compiler
-		$TAR -czf $filename.tar.gz $files
-		$ZIP -r $filename $files
+		cd $ROOT/$os_dir/$compiler_dir
+		$TAR -czf $filename.tar.gz $files > /dev/null
+		$ZIP -r $filename $files > /dev/null
 		cd $OLDWD
 	done
 done
