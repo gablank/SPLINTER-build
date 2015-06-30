@@ -70,6 +70,10 @@ function update_commit_id {
 	echo $(git -C "$SPLINTER_DIR" log -n 1 --pretty=format:"%H") > "$ROOT/$OS/$COMPILER/commit_id"
 }
 
+function update_compiler_version {
+	echo $COMPILER_VERSION > "$ROOT/$OS/$COMPILER/compiler_version"
+}
+
 function build_gcc_clang {
 	ARCH=$1
 	COMPILER=$2
@@ -86,7 +90,7 @@ function build_gcc_clang {
 
 function build_linux {
 	echo "Building for Linux"
-	OS="linux"
+	OS=linux
 	
 	MAKE_CMD=$(which make)
 	NPROC=$(nproc)
@@ -95,6 +99,7 @@ function build_linux {
 	if [[ $GPP != "" ]]; then
 		export CXX=$GPP
 		COMPILER=gcc
+		COMPILER_VERSION=$($CXX -dumpversion)
 		
 		build_gcc_clang x86 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
@@ -106,14 +111,20 @@ function build_linux {
 		"$MAKE_CMD" install
 		cp -r splinter-matlab $ROOT
 		
+		# Copy header files
+		cp -r $SPLINTER_DIR/include $ROOT/$OS/$COMPILER/include
+		cp -r $SPLINTER_DIR/thirdparty/Eigen $ROOT/$OS/$COMPILER/include
+		
 		# Write down the commit id this was compiled from
 		update_commit_id
+		update_compiler_version
 	fi
 	
 	CLANG=$(which clang++-3.5)
 	if [[ $CLANG != "" ]]; then
 		export CXX=$CLANG
-		COMPILER=gcc
+		COMPILER=clang
+		COMPILER_VERSION=$($CXX -dumpversion)
 		
 		build_gcc_clang x86 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
@@ -121,8 +132,13 @@ function build_linux {
 		build_gcc_clang x86-64 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
 		
+		# Copy header files
+		cp -r $SPLINTER_DIR/include $ROOT/$OS/$COMPILER/include
+		cp -r $SPLINTER_DIR/thirdparty/Eigen $ROOT/$OS/$COMPILER/include
+		
 		# Write down the commit id this was compiled from
 		update_commit_id
+		update_compiler_version
 	fi
 }
 
@@ -165,7 +181,7 @@ function build_msvc {
 
 function build_windows {
 	echo "Building for Windows"
-	OS="windows"
+	OS=windows
 	
 	export PATH="$MSBUILD_DIR:$PATH"
 	export PATH="$VCVARSALL_DIR:$PATH"
@@ -178,29 +194,32 @@ function build_windows {
 	GPP=$(which g++)
 	MAKE_CMD=$(which mingw32-make)
 	if [[ $GPP != "" && $MAKE_CMD != "" ]]; then
-		COMPILER=gcc
 		export CXX=$GPP
+		COMPILER=gcc
+		COMPILER_VERSION=$($CXX -dumpversion)
 		
 		build_gcc_clang x86 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.dll libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
+		cp $SPLINTER_DIR/include -r 
 		# Only x86 supported with GCC on Windows for now
 #		build_gcc_clang x86-64 $COMPILER
 		
 		# Write down the commit id this was compiled from
 		update_commit_id
+		update_compiler_version
 	fi
 
 	MSBUILD=$(which msbuild.exe)
 	if [[ $MSBUILD != "" ]]; then
 		COMPILER=msvc
-		
-		MSVC_VERSION=$(msbuild.exe "-version" | grep '^[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+$')
+		COMPILER_VERSION=$(msbuild.exe "-version" | grep '^[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+$')
 		
 		build_msvc "x86" $COMPILER
 		build_msvc "x86-64" $COMPILER
 		
 		# Write down the commit id this was compiled from
 		update_commit_id
+		update_compiler_version
 	fi
 }
 
@@ -208,7 +227,7 @@ function build_windows {
 mkdir -p $ROOT/build # -p to avoid error message when it already exists
 cd $ROOT/build
 
-PLATFORM=$(uname)
+#PLATFORM=$(uname)
 if [[ $PLATFORM == MINGW* ]]; then
 	build_windows
 	
@@ -247,12 +266,27 @@ do
 	done
 done
 
+echo "All builds were built from the same commit, proceeding to make release."
+
 # If tar is installed, and all commit ids are the same,
 # then we make a release
 TAR=$(which tar)
-if [[ $TAR != "" ]]; then
-	COMMIT_ID=""
-	if [ -d "linux" ]; then
-		
-	fi
+ZIP=$(which zip)
+if [[ $TAR == ""  && $ZIP == "" ]]; then
+	echo "Error: Neither tar nor zip is installed, cancelling release."
+	exit 1
 fi
+
+mkdir -p $ROOT/releases
+cd $ROOT/releases
+for os_dir in $OSES
+do
+	for compiler in $(ls $ROOT/$os_dir)
+	do
+		files="x86 x86-64 include"
+		compiler_version=$(cat $ROOT/$os_dir/$compiler/compiler_version)
+		filename=$os_dir_$compiler$compiler_version
+		$TAR -czf $filename.tar.gz
+		$ZIP -czf $filename.tar.gz
+	done
+done
