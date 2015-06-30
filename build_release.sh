@@ -310,13 +310,17 @@ do
 			files="$arch $files"
 		done
 
-		filename=$ROOT/releases/$os_dir"_"$compiler_name$(cat compiler_version)
-		echo "Creating archive $filename from $files"
+		filename=$os_dir"_"$compiler_name$(cat compiler_version)
+		full_filename=$ROOT/releases/$filename
 
 		OLDWD=$(pwd)
 		cd $ROOT/$os_dir/$compiler_dir
-		$TAR -czf $filename.tar.gz $files > /dev/null
-		$ZIP -r $filename $files > /dev/null
+
+		echo "Creating archive $filename.tar.gz"
+		$TAR -czf $full_filename.tar.gz $files > /dev/null
+
+		echo "Creating archive $filename.zip"
+		$ZIP -r $full_filename $files > /dev/null
 		cd $OLDWD
 	done
 done
