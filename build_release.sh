@@ -74,6 +74,11 @@ function update_compiler_version {
 	echo $COMPILER_VERSION > "$ROOT/$OS/$COMPILER/compiler_version"
 }
 
+function copy_header_files {	
+	cp -r $SPLINTER_DIR/include $ROOT/$OS/$COMPILER/
+	cp -r $SPLINTER_DIR/thirdparty/Eigen $ROOT/$OS/$COMPILER/include
+}
+
 function build_gcc_clang {
 	ARCH=$1
 	COMPILER=$2
@@ -109,11 +114,10 @@ function build_linux {
 		build_gcc_clang x86-64 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
 		"$MAKE_CMD" install
-		cp -r splinter-matlab $ROOT
+		# MatLab for Linux only exists as 64bit, so we don't need this
+#		cp -r splinter-matlab $ROOT
 		
-		# Copy header files
-		cp -r $SPLINTER_DIR/include $ROOT/$OS/$COMPILER/include
-		cp -r $SPLINTER_DIR/thirdparty/Eigen $ROOT/$OS/$COMPILER/include
+		copy_header_files
 		
 		# Write down the commit id this was compiled from
 		update_commit_id
@@ -132,9 +136,7 @@ function build_linux {
 		build_gcc_clang x86-64 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
 		
-		# Copy header files
-		cp -r $SPLINTER_DIR/include $ROOT/$OS/$COMPILER/include
-		cp -r $SPLINTER_DIR/thirdparty/Eigen $ROOT/$OS/$COMPILER/include
+		copy_header_files
 		
 		# Write down the commit id this was compiled from
 		update_commit_id
@@ -177,6 +179,8 @@ function build_msvc {
 	cp "Release/splinter-matlab-$SPLINTER_VERSION.dll" "$ROOT/splinter-matlab/lib/$OS/$ARCH/"
 	cp "Release/splinter-$SPLINTER_VERSION.dll" "$ROOT/$OS/$COMPILER/$ARCH"
 	cp "Release/splinter-static-$SPLINTER_VERSION.lib" "$ROOT/$OS/$COMPILER/$ARCH"
+
+	copy_header_files
 }
 
 function build_windows {
@@ -200,7 +204,9 @@ function build_windows {
 		
 		build_gcc_clang x86 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.dll libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
-		cp $SPLINTER_DIR/include -r 
+
+		copy_header_files
+
 		# Only x86 supported with GCC on Windows for now
 #		build_gcc_clang x86-64 $COMPILER
 		
@@ -227,7 +233,7 @@ function build_windows {
 mkdir -p $ROOT/build # -p to avoid error message when it already exists
 cd $ROOT/build
 
-#PLATFORM=$(uname)
+PLATFORM=$(uname)
 if [[ $PLATFORM == MINGW* ]]; then
 	build_windows
 	
@@ -278,15 +284,27 @@ if [[ $TAR == ""  && $ZIP == "" ]]; then
 fi
 
 mkdir -p $ROOT/releases
-cd $ROOT/releases
 for os_dir in $OSES
 do
-	for compiler in $(ls $ROOT/$os_dir)
+	cd $ROOT/$os_dir
+	for compiler_dir in $(echo */) # echo */ gives us a list of the directories
 	do
-		files="x86 x86-64 include"
-		compiler_version=$(cat $ROOT/$os_dir/$compiler/compiler_version)
-		filename=$os_dir_$compiler$compiler_version
-		$TAR -czf $filename.tar.gz
-		$ZIP -czf $filename.tar.gz
+		compiler_name=${compiler_dir::-1} # compiler_dir includes the last /, remove it.
+		cd $ROOT/$os_dir/$compiler_dir
+		files=""
+		for arch in $(echo */)
+		do
+			files="$arch $files"
+		done
+
+		compiler_version=$(cat compiler_version)
+		filename=$ROOT/releases/$os_dir"_$compiler_name$compiler_version"
+		echo "Creating archive called $filename from $files"
+
+		OLDWD=$(pwd)
+		cd $ROOT/$os_dir/$compiler
+		$TAR -czf $filename.tar.gz $files
+		$ZIP -r $filename $files
+		cd $OLDWD
 	done
 done
