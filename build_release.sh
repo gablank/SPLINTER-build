@@ -66,8 +66,13 @@ if [[ $CMAKE_CMD == "" ]]; then
 	exit 1
 fi
 
+function get_commit_id {
+	COMMIT_ID=$(git -C "$SPLINTER_DIR" log -n 1 --pretty=format:"%H")
+}
+
 function update_commit_id {
-	echo $(git -C "$SPLINTER_DIR" log -n 1 --pretty=format:"%H") > "$ROOT/$OS/$COMPILER/commit_id"
+	get_commit_id
+	echo $COMMIT_ID > "$ROOT/$OS/$COMPILER/commit_id"
 }
 
 function update_compiler_version {
@@ -220,12 +225,19 @@ function build_windows {
 		COMPILER=msvc
 		COMPILER_VERSION=$(msbuild.exe "-version" | grep '^[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+.[[:digit:]]\+$')
 		
-		build_msvc "x86" $COMPILER
-		build_msvc "x86-64" $COMPILER
-		
-		# Write down the commit id this was compiled from
-		update_commit_id
-		update_compiler_version
+		last_compiled_commit_id=$(cat $ROOT/$OS/$COMPILER/commit_id)
+		get_commit_id
+		if [[ $last_compiled_commit_id == $COMMIT_ID ]]; then
+			echo "No new commits since last compile with $COMPILER, skipping."
+			
+		else
+			build_msvc "x86" $COMPILER
+			build_msvc "x86-64" $COMPILER
+			
+			# Write down the commit id this was compiled from
+			update_commit_id
+			update_compiler_version
+		fi
 	fi
 }
 
