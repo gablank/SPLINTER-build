@@ -278,8 +278,8 @@ echo "All builds were built from the same commit, proceeding to make release."
 # then we make a release
 TAR=$(which tar)
 ZIP=$(which zip)
-if [[ $TAR == ""  && $ZIP == "" ]]; then
-	echo "Error: Neither tar nor zip is installed, cancelling release."
+if [[ $TAR == ""  || $ZIP == "" ]]; then
+	echo "Error: Missing either tar or zip, need both to create release."
 	exit 1
 fi
 
@@ -299,7 +299,7 @@ do
 		done
 
 		filename=$ROOT/releases/$os_dir"_"$compiler_name$(cat compiler_version)
-		echo "Creating archive called $filename from $files"
+		echo "Creating archive $filename from $files"
 
 		OLDWD=$(pwd)
 		cd $ROOT/$os_dir/$compiler_dir
