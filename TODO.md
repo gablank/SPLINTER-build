@@ -1,0 +1,1 @@
+- Test on a fresh install of Windows and Ubuntu to detect requirements
