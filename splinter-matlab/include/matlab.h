@@ -19,21 +19,40 @@ typedef void *obj_ptr;
 		/* 1 if the previous function call caused an error, 0 otherwise. */
 		API int get_error();
 
+		API const char *get_error_string();
 
 		API obj_ptr datatable_init();
 
-		API void datatable_add_samples(obj_ptr datatable_ptr, double *x, int n_samples, int x_dim);
+		API obj_ptr datatable_load_init(const char *filename);
+
+		API void datatable_add_samples(obj_ptr datatable_ptr, double *x, int n_samples, int x_dim, int size);
+
+		API unsigned int datatable_get_num_variables(obj_ptr datatable_ptr);
+
+		API unsigned int datatable_get_num_samples(obj_ptr datatable_ptr);
+
+		API void datatable_save(obj_ptr datatable_ptr, const char *filename);
+
+		API obj_ptr datatable_load(obj_ptr datatable_ptr, const char *filename);
 
 		API void datatable_delete(obj_ptr datatable_ptr);
 
 
 		API obj_ptr bspline_init(obj_ptr datatable_ptr, int type);
 
+		API obj_ptr bspline_load_init(const char *filename);
+
 		API obj_ptr pspline_init(obj_ptr datatable_ptr, double lambda);
+
+		API obj_ptr pspline_load_init(const char *filename);
 
 		API obj_ptr rbf_init(obj_ptr datatable_ptr, int type_index, int normalized);
 
+		API obj_ptr rbf_load_init(const char *filename);
+
 		API obj_ptr polynomial_regression_init(obj_ptr datatable_ptr, int *degrees, int degrees_dim);
+
+		API obj_ptr polynomial_regression_load_init(const char *filename);
 
 
 		API double eval(obj_ptr approximant, double *x, int x_dim);

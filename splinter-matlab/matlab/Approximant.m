@@ -48,7 +48,9 @@ classdef (Abstract = true) Approximant < handle
 
         % Destructor. Deletes the internal Approximant object.
         function delete(obj)
-            Splinter.getInstance().call('delete_approximant', obj.Handle);
+            if(obj.Handle ~= -1)
+                Splinter.getInstance().call('delete_approximant', obj.Handle);
+            end
         end
     end
 end

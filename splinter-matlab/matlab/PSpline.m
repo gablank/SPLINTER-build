@@ -10,6 +10,7 @@ classdef PSpline < Approximant
         Handle
         
         Constructor_function = 'pspline_init';
+        Constructor_load_function = 'pspline_load_init';
     end
 
     methods
@@ -17,7 +18,7 @@ classdef PSpline < Approximant
         % library, using the samples in dataTable.
         % lambda is the smoothing parameter, usually a small number
         % default: 0.03
-        function obj = PSpline(dataTable, lambda)
+        function obj = PSpline(dataTableOrFilename, lambda)
             if(~exist('lambda', 'var'))
                 lambda = 0.03;
             end
@@ -25,7 +26,15 @@ classdef PSpline < Approximant
             % Set to -1 so we don't try to delete the library instance in case type is invalid
             obj.Handle = -1;
             
-            obj.Handle = Splinter.getInstance().call(obj.Constructor_function, dataTable.get_handle(), lambda);
+            if(ischar(dataTableOrFilename))
+                filename = dataTableOrFilename;
+                
+                obj.Handle = Splinter.getInstance().call(obj.Constructor_load_function, filename);
+            else
+                dataTable = dataTableOrFilename;
+                
+                obj.Handle = Splinter.getInstance().call(obj.Constructor_function, dataTable.get_handle(), lambda);
+            end
         end
     end
 end
