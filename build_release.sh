@@ -27,14 +27,14 @@ do
 key="$1"
 
 case $key in
-    -m|--mingw-binary-dir)
-    PATH="$2:$PATH"
-    shift # past argument
-    ;;
-    -c|--cmake-binary-dir)
-    PATH="$2:$PATH"
-    shift # past argument
-    ;;
+	-m|--mingw-binary-dir)
+	PATH="$2:$PATH"
+	shift # past argument
+	;;
+	-c|--cmake-binary-dir)
+	PATH="$2:$PATH"
+	shift # past argument
+	;;
 	-vc|--vcvarsall-dir)
 	VCVARSALL_DIR="$2"
 	shift # past argument
@@ -43,10 +43,10 @@ case $key in
 	MSBUILD_DIR="$2"
 	shift # past argument
 	;;
-    *)
-    # No preceding: path to SPLINTER
-    SPLINTER_DIR=$1
-    ;;
+	*)
+	# No preceding: path to SPLINTER
+	SPLINTER_DIR=$1
+	;;
 esac
 shift # past argument or value
 done
@@ -61,8 +61,9 @@ CMAKE_CMD=$(which cmake)
 if [[ $CMAKE_CMD == "" ]]; then
 	echo "Error: Can't find CMake, make sure it is in your PATH environment variable"
 	echo "and try again!"
-	echo "If you don't want to add CMake to your PATH, you can specify the path to it with"
+	echo "If you don't want to add CMake to your PATH, you can specify the path to it with:"
 	echo "$COMMAND -c /path/to/cmake/binary/directory"
+	echo "Note that on Windows, the path \"C:/Program Files (x86)/CMake/bin\" has to be written as \"/c/Program Files (x86)/CMake/bin\""
 	exit 1
 fi
 
