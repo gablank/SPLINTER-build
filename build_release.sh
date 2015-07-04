@@ -113,14 +113,14 @@ function build_linux {
 		
 		build_gcc_clang x86 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
-		"$MAKE_CMD" install
-		cp -r splinter-matlab $ROOT
+		# MatLab for Linux only exists as 64bit, so we don't need this
+#		"$MAKE_CMD" install
+#		cp -r splinter-matlab $ROOT
 		
 		build_gcc_clang x86-64 $COMPILER
 		cp libsplinter-$SPLINTER_VERSION.so libsplinter-static-$SPLINTER_VERSION.a "$ROOT/$OS/$COMPILER/$ARCH"
 		"$MAKE_CMD" install
-		# MatLab for Linux only exists as 64bit, so we don't need this
-#		cp -r splinter-matlab $ROOT
+		cp -r splinter-matlab $ROOT
 		
 		copy_header_files
 		
@@ -324,3 +324,14 @@ do
 		cd $OLDWD
 	done
 done
+
+# Make an archive of splinter-matlab
+filename="splinter-matlab"
+full_filename="$ROOT/releases/$filename"
+files="splinter-matlab"
+cd $ROOT
+echo "Creating archive $filename.tar.gz from $files"
+$TAR -czf $full_filename.tar.gz $files > /dev/null
+
+echo "Creating archive $filename.zip"
+$ZIP -r $full_filename $files > /dev/null
