@@ -331,7 +331,7 @@ filename="splinter-matlab"
 full_filename="$ROOT/releases/$filename"
 files="splinter-matlab"
 cd $ROOT
-echo "Creating archive $filename.tar.gz from $files"
+echo "Creating archive $filename.tar.gz"
 $TAR -czf $full_filename.tar.gz $files > /dev/null
 
 echo "Creating archive $filename.zip"
