@@ -12,6 +12,7 @@
 
 #include "datatable.h"
 #include "approximant.h"
+#include <generaldefinitions.h>
 #include "memory"
 
 namespace SPLINTER
@@ -37,6 +38,7 @@ public:
     virtual double eval(double r) const = 0;
     virtual double evalDerivative(double r) const = 0;
     virtual ~RadialBasisFunctionTerm() {}
+
 protected:
     double e;
 };

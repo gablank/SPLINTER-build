@@ -28,9 +28,12 @@ public:
     PSpline(const DataTable &samples);
     PSpline(const DataTable &samples, double lambda);
 
-    void save(const std::string fileName) const override { throw Exception("PSpline::save: not implemented."); };
+    inline double getLambda() { return lambda; }
+
+    void save(const std::string fileName) const override;
 
 protected:
+    PSpline();
 
     // Smoothing parameter (usually set to a small number; default 0.03)
     double lambda;
@@ -40,7 +43,9 @@ protected:
     void getSecondOrderFiniteDifferenceMatrix(SparseMatrix &D);
 
 private:
-    void load(const std::string fileName) override { throw Exception("PSpline::load: not implemented."); };
+    void load(const std::string fileName) override;
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER
