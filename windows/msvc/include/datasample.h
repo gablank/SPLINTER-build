@@ -7,7 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-
 #ifndef SPLINTER_DATASAMPLE_H
 #define SPLINTER_DATASAMPLE_H
 
@@ -35,10 +34,13 @@ public:
     unsigned int getDimX() const { return x.size(); }
 
 private:
+    DataSample();
+
     std::vector<double> x;
     double y;
-
     void setData(const std::vector<double> &x, double y);
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

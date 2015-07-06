@@ -18,6 +18,7 @@ namespace SPLINTER
 class BSplineBasis1D
 {
 public:
+    BSplineBasis1D();
     BSplineBasis1D(std::vector<double> &x, unsigned int degree);
     BSplineBasis1D(std::vector<double> &x, unsigned int degree, bool explicitKnots);
 
@@ -59,7 +60,6 @@ public:
     }
 
 private:
-
     // DeBoorCox algorithm for evaluating basis functions
     double deBoorCox(double x, int i, int k) const;
     double deBoorCoxCoeff(double x, double x_min, double x_max) const;
@@ -83,6 +83,8 @@ private:
     unsigned int degree;
     std::vector<double> knots;
     unsigned int targetNumBasisfunctions;
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

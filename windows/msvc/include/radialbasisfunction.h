@@ -10,6 +10,7 @@
 #ifndef SPLINTER_RADIALBASISFUNCTION_H
 #define SPLINTER_RADIALBASISFUNCTION_H
 
+#include <generaldefinitions.h>
 #include "datatable.h"
 #include "approximant.h"
 #include "radialbasisfunctionterm.h"
@@ -27,7 +28,8 @@ namespace SPLINTER
 class API RadialBasisFunction : public Approximant
 {
 public:
-
+    RadialBasisFunction(const char *filename);
+    RadialBasisFunction(const std::string filename);
     RadialBasisFunction(const DataTable &samples, RadialBasisFunctionType type);
     RadialBasisFunction(const DataTable &samples, RadialBasisFunctionType type, bool normalized);
 
@@ -43,15 +45,17 @@ public:
 
     unsigned int getNumVariables() const override { return dim; }
 
-    void save(const std::string fileName) const override {}
-    void load(const std::string fileName) override {}
+    void save(const std::string fileName) const override;
 
 private:
+    RadialBasisFunction();
 
-    const DataTable samples;
+    DataTable samples;
     bool normalized, precondition;
     unsigned int dim, numSamples;
 
+    // Store the type so we can reconstruct the object when deserializing
+    RadialBasisFunctionType type;
     std::shared_ptr<RadialBasisFunctionTerm> fn;
 
     DenseMatrix weights;
@@ -62,6 +66,9 @@ private:
     double dist(DataSample x, DataSample y) const;
     bool dist_sort(DataSample x, DataSample y) const;
 
+    void load(const std::string fileName) override;
+
+    friend class Serializer;
 };
 
 /*

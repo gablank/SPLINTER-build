@@ -7,7 +7,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
-
 #ifndef SPLINTER_BSPLINE_H
 #define SPLINTER_BSPLINE_H
 
@@ -33,7 +32,6 @@ enum class BSplineType
 class API BSpline : public Approximant
 {
 public:
-
     /**
      * Construct B-spline from knot vectors, control coefficients (assumed vectorized), and basis degrees
      */
@@ -49,6 +47,7 @@ public:
     /**
      * Construct B-spline from file
      */
+    BSpline(const char *fileName);
     BSpline(const std::string fileName);
 
     virtual BSpline* clone() const { return new BSpline(*this); }
@@ -94,8 +93,7 @@ public:
     void save(const std::string fileName) const override;
 
 protected:
-
-	BSpline();
+    BSpline();
 
     BSplineBasis basis;
     DenseMatrix knotaverages; // One row per input
@@ -110,7 +108,6 @@ protected:
     void controlPointEquationRHS(const DataTable &samples, DenseMatrix &Bx, DenseMatrix &By) const;
 
 private:
-
     // Domain reduction
     void regularizeKnotVectors(std::vector<double> &lb, std::vector<double> &ub);
     bool removeUnsupportedBasisFunctions(std::vector<double> &lb, std::vector<double> &ub);
@@ -119,7 +116,8 @@ private:
     bool pointInDomain(DenseVector x) const;
 
     void load(const std::string fileName) override;
-    void loadBasis(std::vector<std::vector<double>> knotVectors, std::vector<unsigned int> basisDegrees);
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

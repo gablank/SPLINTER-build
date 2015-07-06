@@ -26,9 +26,9 @@ class API DataTable
 {
 public:
     DataTable();
-    DataTable(const char *fileName);
     DataTable(bool allowDuplicates);
     DataTable(bool allowDuplicates, bool allowIncompleteGrid);
+    DataTable(const char *fileName);
     DataTable(const std::string fileName); // Load DataTable from file
 
     /*
@@ -108,6 +108,8 @@ private:
     void gridCompleteGuard() const;
 
     void load(const std::string fileName);
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

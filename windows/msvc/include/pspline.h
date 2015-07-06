@@ -23,11 +23,17 @@ namespace SPLINTER
 class API PSpline : public BSpline
 {
 public:
-
+    PSpline(const char *fileName);
+    PSpline(const std::string fileName);
     PSpline(const DataTable &samples);
     PSpline(const DataTable &samples, double lambda);
 
+    inline double getLambda() { return lambda; }
+
+    void save(const std::string fileName) const override;
+
 protected:
+    PSpline();
 
     // Smoothing parameter (usually set to a small number; default 0.03)
     double lambda;
@@ -36,6 +42,10 @@ protected:
     void computeControlPoints(const DataTable &samples) override;
     void getSecondOrderFiniteDifferenceMatrix(SparseMatrix &D);
 
+private:
+    void load(const std::string fileName) override;
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER
