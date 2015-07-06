@@ -1,1 +1,4 @@
 - Test on a fresh install of Windows and Ubuntu to detect requirements
+- Merge SPLINTER-build into SPLINTER
+- Write guide for compiling on Windows and Linux
+- Test on OSX

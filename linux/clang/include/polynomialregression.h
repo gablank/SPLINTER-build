@@ -39,6 +39,8 @@ public:
     void save(const std::string fileName) const override;
 
 private:
+    PolynomialRegression();
+
     unsigned int numVariables;
     unsigned int numCoefficients;
     std::vector<unsigned int> degrees;
@@ -50,6 +52,8 @@ private:
     DenseVector evalMonomials(DenseVector x) const;
 
     void load(const std::string fileName) override;
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

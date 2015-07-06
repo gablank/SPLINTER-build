@@ -69,6 +69,8 @@ private:
     // Fold from left using Kronecker product
     SparseVector foldlKroneckerProductVectors(const std::vector<SparseVector> &vectors) const;
     SparseMatrix foldlKroneckerProductMatrices(const std::vector<SparseMatrix> &matrices) const;
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER

@@ -108,6 +108,8 @@ private:
     void gridCompleteGuard() const;
 
     void load(const std::string fileName);
+
+    friend class Serializer;
 };
 
 } // namespace SPLINTER
